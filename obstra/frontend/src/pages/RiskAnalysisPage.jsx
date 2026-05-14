@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Activity, TrendingUp, Target, Calendar, Users, Download, FileText } from 'lucide-react';
-import axios from 'axios';
+import api from '../api/client';
 import { 
   ResponsiveContainer,
   AreaChart,
@@ -21,7 +21,7 @@ const RiskAnalysisPage = () => {
 
   const fetchData = async () => {
     try {
-      const logsRes = await axios.get('http://localhost:8000/audit/logs');
+      const logsRes = await api.get('/audit/logs', { params: { limit: 1000 } });
       const logData = logsRes.data;
       setLogs(logData);
 

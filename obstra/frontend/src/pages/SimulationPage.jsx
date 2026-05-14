@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Play, Pause, AlertTriangle, CheckCircle } from 'lucide-react';
-import axios from 'axios';
+import api from '../api/client';
 
 const SimulationPage = () => {
   const [isRunning, setIsRunning] = useState(false);
@@ -17,7 +17,7 @@ const SimulationPage = () => {
     try {
       // Step 1: Register Diagnosis Agent
       addLogEntry({ type: 'info', message: 'Registering DiagnosisAgent...' });
-      const agentRes = await axios.post('http://localhost:8001/agents/register', {
+      const agentRes = await api.post('/agents/register', {
         name: 'Simulation-DiagnosisAgent',
         framework: 'langchain',
         owner: 'HospitalA',
@@ -30,12 +30,16 @@ const SimulationPage = () => {
       
       // Step 2: Log READ_FILE
       await new Promise(r => setTimeout(r, 1000));
-      const decision1 = await axios.post('http://localhost:8001/actions/evaluate', {
-        action_type: 'READ_FILE',
-        payload: { file: 'patient_123.pdf' }
-      }, {
-        headers: { 'X-Obstra-Agent-Token': agentRes.data.token }
-      });
+      const decision1 = await api.post(
+        '/actions/evaluate',
+        {
+          action_type: 'READ_FILE',
+          payload: { file: 'patient_123.pdf', summary: 'DiagnosisAgent reading patient record' },
+        },
+        {
+          headers: { Authorization: `Bearer ${agentRes.data.token}` },
+        }
+      );
       addLogEntry({ type: decision1.data.status === 'APPROVED' ? 'success' : 'danger', message: `READ_FILE: ${decision1.data.status}` });
 
       // Step 3: Attempt dangerous dosage
@@ -43,12 +47,16 @@ const SimulationPage = () => {
       addLogEntry({ type: 'warning', message: 'PrescriptionAgent attempting: DOSAGE 3000mg' });
       
       await new Promise(r => setTimeout(r, 1000));
-      const decision2 = await axios.post('http://localhost:8001/actions/evaluate', {
-        action_type: 'DOSAGE',
-        payload: { dosage: 3000, patient: 'patient_123' }
-      }, {
-        headers: { 'X-Obstra-Agent-Token': agentRes.data.token }
-      });
+      const decision2 = await api.post(
+        '/actions/evaluate',
+        {
+          action_type: 'DOSAGE',
+          payload: { dosage: 3000, patient: 'patient_123', intent: 'PrescriptionAgent writing high dosage' },
+        },
+        {
+          headers: { Authorization: `Bearer ${agentRes.data.token}` },
+        }
+      );
       addLogEntry({ type: 'danger', message: `DOSAGE 3000mg: ${decision2.data.status} - ${decision2.data.message}` });
 
     } catch (err) {

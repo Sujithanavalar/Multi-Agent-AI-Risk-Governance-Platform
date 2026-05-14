@@ -1,97 +1,75 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
+import Header from './components/Header';
 import LandingPage from './pages/LandingPage';
 import DashboardOverview from './pages/DashboardOverview';
+import AgentsPage from './pages/AgentsPage';
 import AgentMeshPage from './pages/AgentMeshPage';
-import ThreatsDetectedPage from './pages/ThreatsDetectedPage';
-import RiskAnalysisPage from './pages/RiskAnalysisPage';
 import ApprovalsPage from './pages/ApprovalsPage';
-import AuditTrailPage from './pages/AuditTrailPage';
+import AnomaliesPage from './pages/AnomaliesPage';
 import PolicyManagementPage from './pages/PolicyManagementPage';
+import AuditTrailPage from './pages/AuditTrailPage';
 import ReportsAnalyticsPage from './pages/ReportsAnalyticsPage';
+import NotificationsPage from './pages/NotificationsPage';
+import RiskAnalysisPage from './pages/RiskAnalysisPage';
+import SimulationPage from './pages/SimulationPage';
+import ThreatsDetectedPage from './pages/ThreatsDetectedPage';
+import LiveMonitoringPage from './pages/LiveMonitoringPage';
 import IntegrationsPage from './pages/IntegrationsPage';
 import AdminPanelPage from './pages/AdminPanelPage';
-import SimulationPage from './pages/SimulationPage';
 import ProfilePage from './pages/ProfilePage';
-import { supabase } from './supabase';
+import './index.css';
 
-const App = () => {
-  // Toggle this to false to bypass Supabase auth
-  const USE_SUPABASE_AUTH = false;
-  const [user, setUser] = useState(USE_SUPABASE_AUTH ? null : true);
-  const [loading, setLoading] = useState(USE_SUPABASE_AUTH ? true : false);
+// Simple auth check for now
+const isAuthenticated = () => {
+  return localStorage.getItem('access_token') !== null || true; // Allow demo access
+};
 
-  useEffect(() => {
-    if (USE_SUPABASE_AUTH) {
-      const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-        setUser(session?.user || null);
-        setLoading(false);
-      });
-
-      const checkSession = async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user || null);
-        setLoading(false);
-      };
-      checkSession();
-
-      return () => {
-        authListener?.subscription?.unsubscribe();
-      };
-    }
-  }, []);
-
-  if (loading) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        color: 'var(--primary-red)',
-        fontSize: '1.2rem'
-      }}>
-        Loading Obstra...
-      </div>
-    );
-  }
-
+function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={
-          user ? <Navigate to="/dashboard" replace /> : <LandingPage />
-        } />
-        <Route path="*" element={
-          user ? (
-            <div className="app-container">
+        {/* Landing & Auth */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LandingPage />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/*"
+          element={
+            <div className="app-wrapper">
               <Sidebar />
-              <main className="main-content">
-                <Routes>
-                  <Route path="/dashboard" element={<DashboardOverview />} />
-                  <Route path="/agent-mesh" element={<AgentMeshPage />} />
-                  <Route path="/threats" element={<ThreatsDetectedPage />} />
-                  <Route path="/risk-analysis" element={<RiskAnalysisPage />} />
-                  <Route path="/approvals" element={<ApprovalsPage />} />
-                  <Route path="/audit-trail" element={<AuditTrailPage />} />
-                  <Route path="/policies" element={<PolicyManagementPage />} />
-                  <Route path="/reports" element={<ReportsAnalyticsPage />} />
-                  <Route path="/integrations" element={<IntegrationsPage />} />
-                  <Route path="/admin" element={<AdminPanelPage />} />
-                  <Route path="/simulation" element={<SimulationPage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
-                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                </Routes>
-              </main>
+              <div className="main-area">
+                <Header />
+                <main className="main-content">
+                  <Routes>
+                    <Route path="/dashboard" element={<DashboardOverview />} />
+                    <Route path="/agents" element={<AgentsPage />} />
+                    <Route path="/agent-mesh" element={<AgentMeshPage />} />
+                    <Route path="/approvals" element={<ApprovalsPage />} />
+                    <Route path="/anomalies" element={<AnomaliesPage />} />
+                    <Route path="/policies" element={<PolicyManagementPage />} />
+                    <Route path="/audit-trail" element={<AuditTrailPage />} />
+                    <Route path="/reports" element={<ReportsAnalyticsPage />} />
+                    <Route path="/notifications" element={<NotificationsPage />} />
+                    <Route path="/risk-analysis" element={<RiskAnalysisPage />} />
+                    <Route path="/simulation" element={<SimulationPage />} />
+                    <Route path="/threats" element={<ThreatsDetectedPage />} />
+                    <Route path="/live-monitoring" element={<LiveMonitoringPage />} />
+                    <Route path="/integrations" element={<IntegrationsPage />} />
+                    <Route path="/admin" element={<AdminPanelPage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                  </Routes>
+                </main>
+              </div>
             </div>
-          ) : (
-            <Navigate to="/" replace />
-          )
-        } />
+          }
+        />
       </Routes>
     </Router>
   );
-};
+}
 
 export default App;

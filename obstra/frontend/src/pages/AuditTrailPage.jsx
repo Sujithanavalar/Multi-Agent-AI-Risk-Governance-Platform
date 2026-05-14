@@ -1,30 +1,15 @@
 import React from 'react';
-import DecisionLog from '../components/DecisionLog';
-import axios from 'axios';
 
 const AuditTrailPage = () => {
-  const [logs, setLogs] = React.useState([]);
-
-  React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const logsRes = await axios.get('http://localhost:8000/audit/logs');
-        setLogs(logsRes.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchData();
-  }, []);
-
   return (
     <div>
-      <header style={{ marginBottom: '32px' }}>
-        <h1 style={{ color: 'var(--text-primary)', marginBottom: '8px' }}>Audit Trail (Blockchain)</h1>
-        <p style={{ color: 'var(--text-secondary)' }}>Tamper-proof audit log with hash chaining</p>
-      </header>
-
-      <DecisionLog logs={logs} />
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-obstra-text mb-2">Audit Trail</h1>
+        <p className="text-obstra-text-secondary">Tamper-proof audit log of all activities</p>
+      </div>
+      <div className="bg-white rounded-obstra shadow-card p-6 border border-obstra-border">
+        <p className="text-obstra-text-secondary">Audit trail data coming soon...</p>
+      </div>
     </div>
   );
 };

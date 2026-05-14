@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api/client';
 import { AlertTriangle, Check, X, Eye, FileCode } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -8,7 +8,7 @@ const PendingApprovals = ({ pending, refreshData }) => {
 
   const handleResolve = async (id, approved) => {
     try {
-      await axios.post('http://localhost:8000/consensus/resolve', {
+      await api.post('/consensus/resolve', {
         consensus_id: id,
         approved: approved,
         reviewer: "AdminDashboard",
