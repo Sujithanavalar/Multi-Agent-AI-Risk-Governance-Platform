@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+SQLAlchemy
+psycopg[binary]
+pydantic
+pydantic-settings
+requests
+redis
+scikit-learn
+langgraph
+langchain
+numpy
+pandas
+supabase
+reportlab

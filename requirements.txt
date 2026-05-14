@@ -1,0 +1,12 @@
+langchain
+langchain-ollama
+scikit-learn
+pandas
+numpy
+networkx
+jsonschema
+flask
+flask-socketio
+plotly
+requests
+pytest
